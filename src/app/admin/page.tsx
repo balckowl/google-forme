@@ -2,9 +2,13 @@ import AdminWrapper from "../components/AdminWrapper";
 import { hono } from "../lib/hono-client";
 
 export default async function Page() {
-  const res = await hono.api.allFlags.$get();
+  const res = await hono.api.allFlags.$get({
+    init: {
+      cache: "no-store",
+    },
+  },);
 
-  if(res.status !== 200){
+  if (res.status !== 200) {
     throw Error("何かの問題が発生しました。")
   }
 
