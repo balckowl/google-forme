@@ -24,6 +24,9 @@ import {
   HAND_PRESS_DELTA,
   useHandGuidedBoldness,
 } from "./hooks/useHandGuidedBoldness";
+import { useMousePointerAnimation } from "./hooks/useMousePointerAnimation";
+import { motion, AnimatePresence } from "framer-motion";
+import { MousePointer } from "lucide-react";
 
 export default function Page() {
   const [lastSubmit, setLastSubmit] = useState<FormValues | null>(null);
@@ -49,6 +52,17 @@ export default function Page() {
     tapRipplePosition,
   } = useHandGuidedBoldness({ setValue });
 
+   const {
+    button5Ref,
+    triggerAnimation,
+    controls,
+    isVisible,       
+    isBlockingInteractions: isPointerBlocking,
+  } = useMousePointerAnimation({
+    setValue,                       
+    fieldName: "execution",       
+  });
+
   const onSubmit = async (values: FormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 600));
     setLastSubmit(values);
@@ -58,6 +72,12 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-[#ede7f6] pb-16 pt-8">
       {isBlockingInteractions ? (
+        <div
+          aria-hidden
+          className="fixed inset-0 z-40 cursor-not-allowed bg-transparent"
+        />
+      ) : null}
+      {isPointerBlocking ? (
         <div
           aria-hidden
           className="fixed inset-0 z-40 cursor-not-allowed bg-transparent"
@@ -108,6 +128,23 @@ export default function Page() {
           />
         </div>
       ) : null}
+      <AnimatePresence>
+        {isVisible && ( 
+          <motion.div
+            key="mouse-pointer"
+            style={{
+              position: "fixed",
+              zIndex: 9999,
+              pointerEvents: "none",
+              transformOrigin: "top left",
+            }}
+
+            animate={controls}
+          >
+            <MousePointer size={24} color="#0078d4" style={{ filter: 'drop-shadow(0 0 3px #fff)' }} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4">
         <section className="overflow-hidden rounded-3xl bg-white shadow-sm">
           <div className="h-3 w-full bg-[#673ab7]" />
@@ -205,6 +242,12 @@ export default function Page() {
                         })
                       : register(question.name);
 
+                    question.name === "execution"
+                      ? register(question.name, {
+                          onChange: triggerAnimation,
+                        })
+                      : register(question.name);
+
                   return (
                     <label
                       key={option.value}
@@ -226,6 +269,12 @@ export default function Page() {
                             option.value === "5"
                           ) {
                             boldnessFiveRef.current = node;
+                          }
+                          else if (
+                            question.name === "execution" &&
+                            option.value === "5"
+                          ) {
+                            button5Ref.current = node;
                           }
                         }}
                       />
