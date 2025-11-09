@@ -21,28 +21,27 @@ export const radioQuestions = [
   {
     name: "boldness",
     label: "Boldness of Theft",
-    helper: "Did you snatch that idea with savage confidence or play it safe?",
+    helper: "Did this team snatch that idea with savage confidence?",
   },
   {
     name: "execution",
     label: "Execution & Improvement",
-    helper:
-      "You stole it, but did you glow-up the stolen goods or just copy-paste?",
+    helper: "They stole it, but did they glow-up the stolen goods?",
   },
   {
     name: "humor",
     label: "Humor / Branding",
-    helper: "Does it make us LOL and stick in our heads, or nah?",
+    helper: "Does this project make you LOL and stick in your head?",
   },
   {
     name: "creativity",
     label: "Creativity in Rebranding",
-    helper: "Can you flip the script so it feels fresh, not recycled?",
+    helper: "Did this team flip the script so it feels fresh, not recycled?",
   },
   {
     name: "presentation",
     label: "Presentation",
-    helper: "Did you sell it like a pro, or drop it like a half-baked meme?",
+    helper: "Did this team sell it like pros?",
   },
 ] as const satisfies ReadonlyArray<{
   name: keyof Pick<
