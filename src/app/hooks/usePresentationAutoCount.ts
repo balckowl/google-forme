@@ -40,7 +40,9 @@ export function usePresentationAutoCount({
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clearTimers = useCallback(() => {
-    timersRef.current.forEach((timerId) => clearTimeout(timerId));
+    timersRef.current.forEach((timerId) => {
+      clearTimeout(timerId);
+    });
     timersRef.current = [];
   }, []);
 
@@ -82,10 +84,22 @@ export function usePresentationAutoCount({
       isAutoCountingRef.current = true;
       setIsBlockingInteractions(true);
 
+      const startIndex = ASCENDING_VALUES.indexOf(selectedValue);
+      const animationSequence =
+        startIndex >= 0
+          ? ASCENDING_VALUES.slice(startIndex)
+          : ASCENDING_VALUES;
+
+      if (animationSequence.length === 0) {
+        isAutoCountingRef.current = false;
+        setIsBlockingInteractions(false);
+        return;
+      }
+
       let stepIndex = 0;
 
       const runFrame = () => {
-        const value = ASCENDING_VALUES[stepIndex];
+        const value = animationSequence[stepIndex];
         setValue("presentation", value, {
           shouldDirty: value === "5",
           shouldTouch: value === "5",
@@ -117,7 +131,7 @@ export function usePresentationAutoCount({
           return;
         }
 
-        if (stepIndex < ASCENDING_VALUES.length) {
+        if (stepIndex < animationSequence.length) {
           const timerId = setTimeout(runFrame, COUNT_FRAME_MS);
           timersRef.current.push(timerId);
         }

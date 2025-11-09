@@ -20,6 +20,13 @@ const entryPoints = [
   { x: (targetX: number) => targetX, y: "200vh" }, // 下から
 ] as const;
 
+const RIPPLE_DURATION_MS = 900;
+
+type TapRipplePosition = {
+  top: number;
+  left: number;
+};
+
 export function useMousePointerAnimation({
   setValue,
   fieldName,
@@ -28,12 +35,21 @@ export function useMousePointerAnimation({
   const [isVisible, setisVisible] = useState<boolean>(false);
   const [isBlockingInteractions, setisBlockingInteractions] =
     useState<boolean>(false);
+  const [tapRipplePosition, setTapRipplePosition] =
+    useState<TapRipplePosition | null>(null);
 
   const button5Ref = useRef<HTMLInputElement | null>(null);
   const controls = useAnimation();
   const rippleCleanupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+
+  const clearRippleTimer = useCallback(() => {
+    if (rippleCleanupTimerRef.current) {
+      clearTimeout(rippleCleanupTimerRef.current);
+      rippleCleanupTimerRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (!isBlockingInteractions) return;
@@ -51,11 +67,9 @@ export function useMousePointerAnimation({
 
   useEffect(() => {
     return () => {
-      if (rippleCleanupTimerRef.current) {
-        clearTimeout(rippleCleanupTimerRef.current);
-      }
+      clearRippleTimer();
     };
-  }, []);
+  }, [clearRippleTimer]);
 
   const triggerAnimation = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +78,8 @@ export function useMousePointerAnimation({
         return;
       }
 
+      clearRippleTimer();
+      setTapRipplePosition(null);
       setIsAnimating(true);
       setisBlockingInteractions(true);
 
@@ -114,6 +130,17 @@ export function useMousePointerAnimation({
         transition: { duration: 0.45 },
       });
 
+      const currentRect = button5Ref.current?.getBoundingClientRect() ?? rect;
+      if (currentRect) {
+        setTapRipplePosition({
+          top: currentRect.top + currentRect.height / 2,
+          left: currentRect.left + currentRect.width / 2,
+        });
+        rippleCleanupTimerRef.current = setTimeout(() => {
+          setTapRipplePosition(null);
+          rippleCleanupTimerRef.current = null;
+        }, RIPPLE_DURATION_MS);
+      }
       button5Ref.current.click();
       await controls.start({
         opacity: 0,
@@ -124,7 +151,7 @@ export function useMousePointerAnimation({
       setIsAnimating(false);
       setisBlockingInteractions(false);
     },
-    [controls, isAnimating, setValue, fieldName],
+    [clearRippleTimer, controls, fieldName, isAnimating, setValue],
   );
 
   return {
@@ -133,5 +160,6 @@ export function useMousePointerAnimation({
     controls,
     isVisible,
     isBlockingInteractions,
+    tapRipplePosition,
   };
 }

@@ -51,7 +51,7 @@ export default function Page() {
     handPosition,
     handPressing,
     isBlockingInteractions: isHandBlocking,
-    tapRipplePosition,
+    tapRipplePosition: boldnessTapRipplePosition,
   } = useHandGuidedBoldness({ setValue });
 
   const {
@@ -60,6 +60,7 @@ export default function Page() {
     controls,
     isVisible,
     isBlockingInteractions: isPointerBlocking,
+    tapRipplePosition: executionTapRipplePosition,
   } = useMousePointerAnimation({
     setValue,
     fieldName: "execution",
@@ -116,13 +117,26 @@ export default function Page() {
           className="fixed inset-0 z-40 cursor-not-allowed bg-transparent"
         />
       ) : null}
-      {tapRipplePosition ? (
+      {boldnessTapRipplePosition ? (
         <div
           aria-hidden
           className="pointer-events-none fixed"
           style={{
-            top: `${tapRipplePosition.top}px`,
-            left: `${tapRipplePosition.left}px`,
+            top: `${boldnessTapRipplePosition.top}px`,
+            left: `${boldnessTapRipplePosition.left}px`,
+            zIndex: 45,
+          }}
+        >
+          <span className="tap-pulse" />
+        </div>
+      ) : null}
+      {executionTapRipplePosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed"
+          style={{
+            top: `${executionTapRipplePosition.top}px`,
+            left: `${executionTapRipplePosition.left}px`,
             zIndex: 45,
           }}
         >
@@ -332,29 +346,30 @@ export default function Page() {
               <p className="mt-1 text-sm text-[#5f6368]">{question.helper}</p>
               <div className="mt-4 space-y-3">
                 {ratingOptions.map((option) => {
-                  const registerProps = (() => {
-                    if (question.name === "boldness") {
-                      return register(question.name, {
-                        onChange: handleBoldnessOverride,
-                      });
+                  const fieldName = question.name;
+                  const onChangeHandler = (() => {
+                    if (fieldName === "boldness") {
+                      return handleBoldnessOverride;
                     }
-                    if (question.name === "humor") {
-                      return register(question.name, {
-                        onChange: handleHumorOverride,
-                      });
+                    if (fieldName === "humor") {
+                      return handleHumorOverride;
                     }
-                    if (question.name === "creativity") {
-                      return register(question.name, {
-                        onChange: handleCreativityOverride,
-                      });
+                    if (fieldName === "creativity") {
+                      return handleCreativityOverride;
                     }
-                    if (question.name === "presentation") {
-                      return register(question.name, {
-                        onChange: handlePresentationOverride,
-                      });
+                    if (fieldName === "presentation") {
+                      return handlePresentationOverride;
                     }
-                    return register(question.name);
+                    if (fieldName === "execution") {
+                      return triggerAnimation;
+                    }
+                    return undefined;
                   })();
+
+                  const registerProps = register(
+                    fieldName,
+                    onChangeHandler ? { onChange: onChangeHandler } : undefined,
+                  );
 
                   const labelClassNames = [
                     "flex items-center gap-3 text-[#202124]",
