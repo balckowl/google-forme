@@ -11,6 +11,12 @@ import {
 } from "../schemas/admin.schema";
 
 export const publicRoutes = new Hono()
+  .get("/allFlags", async (c) => {
+    const allFlags = await db.query.featureFlags.findMany();
+    const flags = allFlags[0];
+
+    return c.json(flags,200);
+  })
   .put(
     "/isFormeBoldness",
     zValidator("json", formeBoldnessInput),
@@ -77,14 +83,3 @@ export const publicRoutes = new Hono()
       );
     },
   )
-  .get("/allFlags", async (c) => {
-    const allFlags = await db.query.featureFlags.findMany();
-    const flags = allFlags[0];
-
-    return c.json(
-      {
-        ...flags,
-      },
-      200,
-    );
-  });
