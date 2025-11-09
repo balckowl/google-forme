@@ -1,17 +1,18 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   CheckCircle2,
   CloudCheck,
   Mail,
+  MousePointer,
   SendHorizontal,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
 import { RequiredMark } from "./components/RequiredMark";
 import {
   defaultValues,
@@ -20,13 +21,14 @@ import {
   radioQuestions,
   ratingOptions,
 } from "./constants/form";
+import { useCreativeMeltdown } from "./hooks/useCreativeMeltdown";
+import { useDevilHumorOverride } from "./hooks/useDevilHumorOverride";
 import {
   HAND_PRESS_DELTA,
   useHandGuidedBoldness,
 } from "./hooks/useHandGuidedBoldness";
 import { useMousePointerAnimation } from "./hooks/useMousePointerAnimation";
-import { motion, AnimatePresence } from "framer-motion";
-import { MousePointer } from "lucide-react";
+import { usePresentationAutoCount } from "./hooks/usePresentationAutoCount";
 
 export default function Page() {
   const [lastSubmit, setLastSubmit] = useState<FormValues | null>(null);
@@ -48,20 +50,52 @@ export default function Page() {
     handInPlace,
     handPosition,
     handPressing,
-    isBlockingInteractions,
-    tapRipplePosition,
+    isBlockingInteractions: isHandBlocking,
+    tapRipplePosition: boldnessTapRipplePosition,
   } = useHandGuidedBoldness({ setValue });
 
-   const {
+  const {
     button5Ref,
     triggerAnimation,
     controls,
-    isVisible,       
+    isVisible,
     isBlockingInteractions: isPointerBlocking,
+    tapRipplePosition: executionTapRipplePosition,
   } = useMousePointerAnimation({
-    setValue,                       
-    fieldName: "execution",       
+    setValue,
+    fieldName: "execution",
   });
+
+  const {
+    devilImage,
+    devilPosition,
+    handleHumorOverride,
+    humorFiveRef,
+    humorQuestionRef,
+    isBlockingInteractions: isDevilBlocking,
+    tapRipplePosition: devilTapRipplePosition,
+  } = useDevilHumorOverride({ setValue });
+
+  const {
+    creativityFiveRef,
+    handleCreativityOverride,
+    isBlockingInteractions: isCreativityBlocking,
+    meltingOption,
+    tapRipplePosition: creativityTapRipplePosition,
+  } = useCreativeMeltdown({ setValue });
+
+  const {
+    handlePresentationOverride,
+    isBlockingInteractions: isPresentationBlocking,
+    registerPresentationRef,
+    tapRipplePosition: presentationTapRipplePosition,
+  } = usePresentationAutoCount({ setValue });
+
+  const isBlockingInteractions =
+    isHandBlocking ||
+    isDevilBlocking ||
+    isCreativityBlocking ||
+    isPresentationBlocking;
 
   const onSubmit = async (values: FormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 600));
@@ -83,13 +117,65 @@ export default function Page() {
           className="fixed inset-0 z-40 cursor-not-allowed bg-transparent"
         />
       ) : null}
-      {tapRipplePosition ? (
+      {boldnessTapRipplePosition ? (
         <div
           aria-hidden
           className="pointer-events-none fixed"
           style={{
-            top: `${tapRipplePosition.top}px`,
-            left: `${tapRipplePosition.left}px`,
+            top: `${boldnessTapRipplePosition.top}px`,
+            left: `${boldnessTapRipplePosition.left}px`,
+            zIndex: 45,
+          }}
+        >
+          <span className="tap-pulse" />
+        </div>
+      ) : null}
+      {executionTapRipplePosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed"
+          style={{
+            top: `${executionTapRipplePosition.top}px`,
+            left: `${executionTapRipplePosition.left}px`,
+            zIndex: 45,
+          }}
+        >
+          <span className="tap-pulse" />
+        </div>
+      ) : null}
+      {devilTapRipplePosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed"
+          style={{
+            top: `${devilTapRipplePosition.top}px`,
+            left: `${devilTapRipplePosition.left}px`,
+            zIndex: 45,
+          }}
+        >
+          <span className="tap-pulse" />
+        </div>
+      ) : null}
+      {creativityTapRipplePosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed"
+          style={{
+            top: `${creativityTapRipplePosition.top}px`,
+            left: `${creativityTapRipplePosition.left}px`,
+            zIndex: 45,
+          }}
+        >
+          <span className="tap-pulse" />
+        </div>
+      ) : null}
+      {presentationTapRipplePosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed"
+          style={{
+            top: `${presentationTapRipplePosition.top}px`,
+            left: `${presentationTapRipplePosition.left}px`,
             zIndex: 45,
           }}
         >
@@ -128,8 +214,29 @@ export default function Page() {
           />
         </div>
       ) : null}
+      {devilPosition ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed z-40"
+          style={{
+            top: `${devilPosition.top}px`,
+            left: `${devilPosition.left}px`,
+          }}
+        >
+          <Image
+            alt=""
+            className="pointer-events-none w-auto select-none"
+            draggable={false}
+            height={300}
+            src={
+              devilImage === "before" ? "/devil-before.PNG" : "/devil-after.PNG"
+            }
+            width={300}
+          />
+        </div>
+      ) : null}
       <AnimatePresence>
-        {isVisible && ( 
+        {isVisible && (
           <motion.div
             key="mouse-pointer"
             style={{
@@ -138,10 +245,13 @@ export default function Page() {
               pointerEvents: "none",
               transformOrigin: "top left",
             }}
-
             animate={controls}
           >
-            <MousePointer size={24} color="#0078d4" style={{ filter: 'drop-shadow(0 0 3px #fff)' }} />
+            <MousePointer
+              size={24}
+              color="#0078d4"
+              style={{ filter: "drop-shadow(0 0 3px #fff)" }}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -227,6 +337,7 @@ export default function Page() {
               className={`rounded-2xl border bg-white p-6 ${
                 errors[question.name] ? "border-[#d93025]" : "border-[#dadce0]"
               }`}
+              ref={question.name === "humor" ? humorQuestionRef : undefined}
             >
               <div className="flex items-center text-base font-semibold text-[#202124]">
                 {question.label}
@@ -235,23 +346,49 @@ export default function Page() {
               <p className="mt-1 text-sm text-[#5f6368]">{question.helper}</p>
               <div className="mt-4 space-y-3">
                 {ratingOptions.map((option) => {
-                  const registerProps =
-                    question.name === "boldness"
-                      ? register(question.name, {
-                          onChange: handleBoldnessOverride,
-                        })
-                      : register(question.name);
+                  const fieldName = question.name;
+                  const onChangeHandler = (() => {
+                    if (fieldName === "boldness") {
+                      return handleBoldnessOverride;
+                    }
+                    if (fieldName === "humor") {
+                      return handleHumorOverride;
+                    }
+                    if (fieldName === "creativity") {
+                      return handleCreativityOverride;
+                    }
+                    if (fieldName === "presentation") {
+                      return handlePresentationOverride;
+                    }
+                    if (fieldName === "execution") {
+                      return triggerAnimation;
+                    }
+                    return undefined;
+                  })();
 
-                    question.name === "execution"
-                      ? register(question.name, {
-                          onChange: triggerAnimation,
-                        })
-                      : register(question.name);
+                  const registerProps = register(
+                    fieldName,
+                    onChangeHandler ? { onChange: onChangeHandler } : undefined,
+                  );
+
+                  const labelClassNames = [
+                    "flex items-center gap-3 text-[#202124]",
+                  ];
+                  if (question.name === "creativity") {
+                    labelClassNames.push("creativity-option");
+                    if (meltingOption) {
+                      if (option.value === meltingOption) {
+                        labelClassNames.push("creativity-option--melting");
+                      } else if (option.value !== "5") {
+                        labelClassNames.push("creativity-option--fading");
+                      }
+                    }
+                  }
 
                   return (
                     <label
                       key={option.value}
-                      className="flex items-center gap-3 text-[#202124]"
+                      className={labelClassNames.join(" ")}
                     >
                       <input
                         className={`h-4 w-4 border-2 text-[#673ab7] focus:ring-[#673ab7] ${
@@ -270,7 +407,21 @@ export default function Page() {
                           ) {
                             boldnessFiveRef.current = node;
                           }
-                          else if (
+                          if (
+                            question.name === "humor" &&
+                            option.value === "5"
+                          ) {
+                            humorFiveRef.current = node;
+                          }
+                          if (
+                            question.name === "creativity" &&
+                            option.value === "5"
+                          ) {
+                            creativityFiveRef.current = node;
+                          }
+                          if (question.name === "presentation") {
+                            registerPresentationRef(option.value, node);
+                          } else if (
                             question.name === "execution" &&
                             option.value === "5"
                           ) {
