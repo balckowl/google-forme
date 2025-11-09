@@ -1,0 +1,4 @@
+import { Hono } from "hono";
+
+export const app = new Hono().basePath("/api");
+export type AppType = typeof app;
