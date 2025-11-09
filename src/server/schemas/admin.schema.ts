@@ -8,6 +8,8 @@ const featureFlagsSchema = z.object({
   isFormePresentation: z.boolean(),
 });
 
+export type FeatureFlags = z.infer<typeof featureFlagsSchema>;
+
 export const formeBoldnessInput = featureFlagsSchema.pick({
   isFormeBoldness: true,
 });
