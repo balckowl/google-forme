@@ -86,9 +86,7 @@ export function usePresentationAutoCount({
 
       const startIndex = ASCENDING_VALUES.indexOf(selectedValue);
       const animationSequence =
-        startIndex >= 0
-          ? ASCENDING_VALUES.slice(startIndex)
-          : ASCENDING_VALUES;
+        startIndex >= 0 ? ASCENDING_VALUES.slice(startIndex) : ASCENDING_VALUES;
 
       if (animationSequence.length === 0) {
         isAutoCountingRef.current = false;
