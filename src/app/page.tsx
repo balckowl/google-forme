@@ -1,7 +1,16 @@
-import { db } from "@/db";
 import FormWrapper from "./components/FormWrapper";
+import { hono } from "./lib/hono-client";
+
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
-  const allFlags = await db.query.featureFlags.findMany();
-  return <FormWrapper flags={allFlags[0]} />;
+  const res = await hono.api.allflags.$get();
+
+  if (res.status !== 200) {
+    throw Error("何かの問題が発生しました。")
+  }
+
+  const flags = await res.json();
+
+  return <FormWrapper flags={flags} />;
 }
