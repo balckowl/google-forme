@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Goodgle Forme",
+  title: "Goodle Forme",
   description: "You can manipulate the form results as you wish.",
 };
 

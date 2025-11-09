@@ -516,10 +516,10 @@ export default function FormWrapper({ flags }: { flags: FeatureFlags }) {
 
         <footer className="space-y-2 rounded-2xl bg-transparent px-4 py-8 text-center text-xs text-[#5f6368]">
           <p className="text-xs text-start font-medium leading-snug">
-            Never submit passwords through Goodgle Forme.
+            Never submit passwords through Goodle Forme.
           </p>
           <p className="text-xs leading-snug">
-            This content is neither created nor endorsed by Goodgle Forme.{" "}
+            This content is neither created nor endorsed by Goodle Forme.{" "}
             <span className="text-[#202124]">-</span>{" "}
             <a className="font-medium text-[#5f6368] underline" href="/">
               Contact form owner
@@ -540,7 +540,7 @@ export default function FormWrapper({ flags }: { flags: FeatureFlags }) {
             </a>
           </p>
           <div className="pt-1 text-2xl font-medium text-[#5f6368]">
-            Goodgle Forme
+            Goodle Forme
           </div>
         </footer>
       </div>
